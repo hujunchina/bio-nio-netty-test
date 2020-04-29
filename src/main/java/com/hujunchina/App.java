@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class App {
     public static void main(String[] args) throws IOException {
-        System.out.println("========== Welcome using my bio model v1.0.2 =========");
+        System.out.println("========== Welcome using my bio model v1.0.3 =========");
         System.out.println("To bootstrap server please input: App server");
         System.out.println("To bootstrap client please input: App client");
         System.out.println("You can order a host: App client 127.0.0.1");
@@ -23,7 +23,7 @@ public class App {
         }else if(args[0].equals("client")) {
             String host = "127.0.0.1";
             if(args.length > 1) {
-                host = args[2];
+                host = args[1];
                 System.out.println("Using new host "+host);
             }
             BIOClient bioClient = new BIOClient(host);
