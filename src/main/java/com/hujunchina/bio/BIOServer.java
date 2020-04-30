@@ -71,7 +71,7 @@ public class BIOServer implements Runnable {
                 }
 
             } catch (IOException e) {
-                Util.echo("Server", "IOException");
+                Util.echo("Server", "Client exit.");
                 if( serverSocket != null){
                     socketClient = null;
                 }

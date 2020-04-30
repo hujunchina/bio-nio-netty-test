@@ -53,9 +53,9 @@ Maven 可以替代 Ant，作为编译部署工具。
 
 `cd target`
 
-`java -cp WebClientServer-1.0-SNAPSHOT.jar com.hujun.App`
+`java -cp WebClientServer-1.0-SNAPSHOT.jar com.hujunchina.App server`
 
-即可运行 BIO 项目。
+即可运行 BIO 项目，启动服务端。
 
 
 

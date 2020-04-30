@@ -8,19 +8,24 @@ JavaWeb socket demo including BIO NIO and Netty etc.
 1. BIO 实现和应用
 2. 优化 BIO 流模型
 3. BIO 原理和缺点
-4. NIO 实现
-5. NIO 2 实现
-6. Netty 实现
+4. BIO Connection Per Thread 版本
+5. NIO 实现
+6. NIO 2 实现
+7. Netty 实现
+
+
 
 ### 如何部署运行
 
-本项目用 Maven 搭建，Git Clone 项目到本地，运行 Maven init 构建项目。
+本项目用 Maven 搭建，Git Clone 项目到本地，运行 Maven install 构建项目。
 
 再编译运行 app.java 即可启动服务器，默认绑定并监听 7250 端口。
 
 服务器地址：http://47.114.146.180/
 
 socket 测试工具：http://sockettest.sourceforge.net/
+
+
 
 ### 1. BIO 实现和应用
 
@@ -61,6 +66,8 @@ Java 实例化 ServerSocket 和Socket 的过程，对应 Linux 操作有三个�
 当服务端已经启动并调用 accept 方法，客户端实例化的完成 就包括连接服务器成功。
 
 #### 1.3 BIO 应用
+
+
 
 ### 2. 优化 BIO 流模型
 
@@ -118,7 +125,7 @@ socket 绑定的是基本的字节流 InputStream，需要包裹为可接收字�
 
 关于读写线程分离：构建一个 Runnable 线程，让该线程进行写。
 
-:arrow_forward: 尝试失败！
+
 
 ### 3. BIO 原理和优缺点
 
@@ -137,4 +144,42 @@ Java 代码中对象（服务端和客户端）进行读写时都是进行了 re
 
 缺点是不适合网络大并发情况，服务端会有两次阻塞，一次是等待客户端的 accept 方法，这个是只有客户端来了才能继续执行，客户端来了产生一个新的 socket，并创建一个新的线程去服务这个socket。所以多个客户端连接时，要么阻塞一个一个来，要么开多线程来实现高并发。可以使用线程池来管理多线程，但对百万并发就束手无策了，有性能瓶颈。
 
-### 4. NIO 实现
+
+
+### 4. BIO Connection Per Thread 版本
+
+#### 4.1 关于概念
+
+上节简单的实现了 BIO 简单版本，但是无法多客户端连接。这里实现Connection Per Thread 版本解决多客户端问题。Connection Per Thread 即客户端每来一个连接请求，服务端都新开一个线程去响应这个连接。
+
+对 accept 得到的 socket 交给 handler 去处理即可。
+
+#### 4.2 服务端
+
+当接收到一个客户端请求时，就创建一个新的线程来处理。
+
+```java
+Socket client = serverSocket.accept();
+new Thread(new ClientHandler(client)).start();
+```
+
+客户端和简单的 BIO 模型一样。
+
+#### 4.3 优缺点
+
+通过开线程方式，使传统BIO模型能够支持多终端访问，可以利用CPU资源，但无法应对高并发情况，而且线程开销大，浪费大量CPU资源。
+
+
+
+### 5. NIO 实现
+
+#### 5.1 关于概念
+
+BIO 在等待数据和复制数据是阻塞的，这部分是操作系统内核完成的事情。其实操作系统还提供了一个选项，把这个过程设置为非阻塞（Non-blocking）。当是这个状态时，如果 read 系统调用，内核缓存区没有数据，会立刻返回结果而不等待了，但是如果有数据还是要等待复制完数据的。
+
+这个也叫 NIO 模型，但和 Java 中的 NIO 模型不是一回事。
+
+Java 中的 NIO 是 New IO 的简称，即全新的 IO 模型。一种基于多路复用机制的 同步非阻塞IO模型。（避免了Non-blocking IO 不断轮询等待问题）。
+
+
+
